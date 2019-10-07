@@ -8,6 +8,7 @@ import Nav from "react-bootstrap/Nav";
 import axios from 'axios';
 import ReactPlayer from "react-player";
 import './App.css';
+import Splash from "./components/Splash";
 
 class App extends Component {
 
@@ -69,6 +70,7 @@ class App extends Component {
                 </Navbar>
                 <ReactPlayer className="player-wrapper" url={this.state.selected} controls playing width='100%'
                              height='100%'/>
+                {this.state.selected === '' ? <Splash/> : null}
             </Container>
         );
     }
