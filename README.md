@@ -1,3 +1,9 @@
+# iptv
+
+A Freeview New Zealand HLS streaming TV client created with React.
+
+This project uses M3U8 playlists provided by [Matt Huisman](https://github.com/matthuisman) to find the streams.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

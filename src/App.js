@@ -10,18 +10,29 @@ import ReactPlayer from "react-player";
 import './App.css';
 import Splash from "./components/Splash";
 
+// these channels are excluded as their CORS policies don't allow them to load
+const excludedChannels = [
+    "PRIME",
+    "Choice TV",
+    "HGTV",
+    "Chinese TV28",
+    "Chinese TV29",
+    "APNA Television",
+    "Panda TV"
+];
+
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             channels: [],
-            selected: ''
+            selected: null
         };
         this.chooseChannel = this.chooseChannel.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         axios.get('https://i.mjh.nz/nz/raw-tv.m3u8')
             .then(res => {
                 this.setState({
@@ -31,7 +42,6 @@ class App extends Component {
     }
 
     m3uToObj(m3u) {
-        console.log(m3u);
         return m3u
             .replace('#EXTM3U', '')
             .split('#EXTINF:-1 ')
@@ -45,32 +55,39 @@ class App extends Component {
                     "title": info[0],
                     "streaming_url": info[1],
                 };
-            });
+            })
+            .filter(ch => !excludedChannels.includes(ch.title));
     }
 
     chooseChannel(e, channel) {
         e.preventDefault();
         this.setState({
-            selected: channel.streaming_url
+            selected: channel
         })
     }
 
     render() {
         const channels = this.state.channels.map(ch => (
-            <NavDropdown.Item onClick={(e) => this.chooseChannel(e, ch)}>{ch.title}</NavDropdown.Item>));
+            <NavDropdown.Item key={ch.id} onClick={(e) => this.chooseChannel(e, ch)}>{ch.title}</NavDropdown.Item>));
+
         return (
             <Container fluid style={{backgroundColor: 'black'}}>
                 <Navbar bg="dark" variant="dark">
-                    <NavbarBrand>IPTV</NavbarBrand>
+                    <NavbarBrand>Freeview NZ</NavbarBrand>
                     <Nav className="mr-auto">
                         <NavDropdown id="channelDropdown" title="Channels">
                             {channels}
                         </NavDropdown>
                     </Nav>
+                    {this.state.selected ?
+                        <Navbar.Text>
+                            Currently Playing: {this.state.selected.title}
+                        </Navbar.Text>
+                    : null}
                 </Navbar>
-                <ReactPlayer className="player-wrapper" url={this.state.selected} controls playing width='100%'
+                <ReactPlayer className="player-wrapper" url={this.state.selected ? this.state.selected.streaming_url : ''} controls playing width='100%'
                              height='100%'/>
-                {this.state.selected === '' ? <Splash/> : null}
+                {this.state.selected === null ? <Splash/> : null}
             </Container>
         );
     }
