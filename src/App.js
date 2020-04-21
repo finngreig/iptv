@@ -49,11 +49,12 @@ class App extends Component {
             .map(function (str, index) {
                 const line = str.split(',');
                 const info = line[1].split('\n');
+                const uri = info[1].split('//')[1];
 
                 return {
                     "id": index + 1,
                     "title": info[0],
-                    "streaming_url": info[1],
+                    "streaming_url": 'https://' + uri,
                 };
             })
             .filter(ch => !excludedChannels.includes(ch.title));
