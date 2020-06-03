@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Splash.css';
+import './style.css';
 
 class Splash extends Component {
 

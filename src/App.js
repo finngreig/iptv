@@ -9,6 +9,7 @@ import axios from 'axios';
 import ReactPlayer from "react-player";
 import './App.css';
 import Splash from "./components/Splash";
+import CastButton from "./components/CastButton";
 
 // these channels are excluded as their CORS policies don't allow them to load
 const excludedChannels = [
@@ -75,10 +76,11 @@ class App extends Component {
             <Container fluid style={{backgroundColor: 'black'}}>
                 <Navbar bg="dark" variant="dark">
                     <NavbarBrand>Freeview NZ</NavbarBrand>
-                    <Nav className="mr-auto">
-                        <NavDropdown id="channelDropdown" title="Channels">
+                    <Nav className="ml-auto">
+                        <NavDropdown alignRight id="channelDropdown" title="Channels">
                             {channels}
                         </NavDropdown>
+                        <Nav.Link><CastButton/></Nav.Link>
                     </Nav>
                     {this.state.selected ?
                         <Navbar.Text>
