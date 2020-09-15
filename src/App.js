@@ -39,7 +39,7 @@ class App extends Component {
     }
 
     async getChannelList() {
-        const res = await axios.get('https://i.mjh.nz/nz/tv.json');
+        const res = await axios.get('/.netlify/functions/channel_list');
         const channelList = res.data;
 
         Object.keys(channelList)
