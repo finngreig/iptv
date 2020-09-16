@@ -60,8 +60,9 @@ class App extends Component {
     }
 
     getSecureStreamingUrl(channel) {
-        const uri = channel.mjh_master.split('//')[1];
-        return 'https://' + uri;
+        const uriParts = channel.mjh_master.split('/');
+        const uri = uriParts[uriParts.length - 1];
+        return '/.netlify/functions/channel?q=' + uri;
     }
 
     chooseChannel(e, channel) {
