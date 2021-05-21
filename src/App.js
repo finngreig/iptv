@@ -39,7 +39,7 @@ class App extends Component {
     }
 
     async getChannelList() {
-        const res = await axios.get('/.netlify/functions/channel_list');
+        const res = await axios.get('/api/channel_list');
         const channelList = res.data;
 
         Object.keys(channelList)
@@ -62,7 +62,7 @@ class App extends Component {
     getSecureStreamingUrl(channel) {
         const uriParts = channel.mjh_master.split('/');
         const uri = uriParts[uriParts.length - 1];
-        return '/.netlify/functions/channel?q=' + uri;
+        return '/api/channel?q=' + uri;
     }
 
     chooseChannel(e, channel) {
