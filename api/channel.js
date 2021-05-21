@@ -5,6 +5,6 @@ module.exports = (req, res) => {
 
     fetch('https://i.mjh.nz/nz/' + fileName)
         .then (r => {
-            res.status(302).set("Location", r.url).end();
+            res.redirect(302, r.url);
         });
 }
