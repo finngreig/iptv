@@ -13,13 +13,14 @@ import CastButton from "./components/CastButton";
 
 // these channels are excluded as their CORS policies don't allow them to load
 const excludedChannels = [
-    "PRIME",
-    "Choice TV",
-    "HGTV",
-    "Chinese TV28",
-    "Chinese TV29",
-    "APNA Television",
-    "Panda TV"
+    "tv.28",
+    "tv.37",
+    "tv.58",
+    "tv.21",
+    "tv.36",
+    "tv.49",
+    "tv.63",
+    "tv.56"
 ];
 
 class App extends Component {
@@ -31,34 +32,38 @@ class App extends Component {
             selected: null
         };
         this.chooseChannel = this.chooseChannel.bind(this);
+        this.getChannelList = this.getChannelList.bind(this);
     }
 
-    componentDidMount() {
-        axios.get('https://i.mjh.nz/nz/raw-tv.m3u8')
-            .then(res => {
-                this.setState({
-                    channels: this.m3uToObj(res.data)
-                })
-            })
+    async componentDidMount() {
+        await this.getChannelList();
     }
 
-    m3uToObj(m3u) {
-        return m3u
-            .replace('#EXTM3U', '')
-            .split('#EXTINF:-1 ')
-            .slice(1)
-            .map(function (str, index) {
-                const line = str.split(',');
-                const info = line[1].split('\n');
-                const uri = info[1].split('//')[1];
+    async getChannelList() {
+        const res = await axios.get('/api/channel_list');
+        const channelList = res.data;
 
-                return {
-                    "id": index + 1,
-                    "title": info[0],
-                    "streaming_url": 'https://' + uri,
-                };
+        Object.keys(channelList)
+            .filter(key => excludedChannels.includes(key))
+            .forEach(key => delete channelList[key]);
+        
+        this.setState({
+            channels: Object.values(channelList).sort((a, b) => {
+                if (a.channel < b.channel) {
+                    return -1;
+                }
+                if (a.channel > b.channel) {
+                    return 1;
+                }
+                return 0;
             })
-            .filter(ch => !excludedChannels.includes(ch.title));
+        });
+    }
+
+    getSecureStreamingUrl(channel) {
+        const uriParts = channel.mjh_master.split('/');
+        const uri = uriParts[uriParts.length - 1];
+        return '/api/channel?q=' + uri;
     }
 
     chooseChannel(e, channel) {
@@ -70,7 +75,7 @@ class App extends Component {
 
     render() {
         const channels = this.state.channels.map(ch => (
-            <NavDropdown.Item key={ch.id} onClick={(e) => this.chooseChannel(e, ch)}>{ch.title}</NavDropdown.Item>));
+            <NavDropdown.Item key={ch.channel || Math.random() * (100 - 50) + 50} onClick={(e) => this.chooseChannel(e, ch)}>{ch.name}</NavDropdown.Item>));
 
         return (
             <Container fluid style={{backgroundColor: 'black'}}>
@@ -84,11 +89,11 @@ class App extends Component {
                     </Nav>
                     {this.state.selected ?
                         <Navbar.Text>
-                            Currently Playing: {this.state.selected.title}
+                            Currently Playing: {this.state.selected.name}
                         </Navbar.Text>
                     : null}
                 </Navbar>
-                <ReactPlayer className="player-wrapper" url={this.state.selected ? this.state.selected.streaming_url : ''} controls playing width='100%'
+                <ReactPlayer className="player-wrapper" url={this.state.selected ? this.getSecureStreamingUrl(this.state.selected) : ''} controls playing width='100%'
                              height='100%'/>
                 {this.state.selected === null ? <Splash/> : null}
             </Container>
